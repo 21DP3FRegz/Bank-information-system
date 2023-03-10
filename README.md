@@ -22,5 +22,5 @@ During the project, it is necessary to develop a console application that will w
 
 # Project Prototipe
 
-![image](https://user-images.githubusercontent.com/43446910/224294735-85a4d485-3723-4f0a-8a66-0bd8178292b8.png)
+![image](https://user-images.githubusercontent.com/43446910/224301122-8d3cbd94-e432-46ce-9fad-92f087736ade.png)
 
