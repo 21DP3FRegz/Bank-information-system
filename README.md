@@ -1,4 +1,4 @@
-# Bank-system information
+# Uzdevums - Bank-system information (Grupu darbs)
 
 ## Created By
 - Fēlikss Regzdiņš
