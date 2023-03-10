@@ -2,7 +2,7 @@
 
 ## Created By
 - Fēlikss Regzdiņš
-- Mirismayil Seyidov
+- MirIsmayil Seyidov
 
 # Apraksts
 The project is part of the subject "System Programming".
