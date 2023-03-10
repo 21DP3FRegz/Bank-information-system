@@ -20,7 +20,7 @@ During the project, it is necessary to develop a console application that will w
 - [ ] Report to be prepared in accordance with the requirements 
 - [ ] Object data must be recorded in binary (or text) files 
 
-# Project Prototipe
+# Project Prototype
 
 ![image](https://user-images.githubusercontent.com/43446910/224301122-8d3cbd94-e432-46ce-9fad-92f087736ade.png)
 
