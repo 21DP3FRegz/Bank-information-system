@@ -1,10 +1,14 @@
 from client import Client
-from account import Account
 
 
 def main():
-    client = Client("ferepas", "12346", 17120522710, "Fēlikss")
-    print(client.name, client.password, client.email, sep="\t")
+    client = Client(
+        login="admin",
+        password="admin1234",
+        name="Серёга",
+        email="admin@rvt.lv"
+    )
+    client.save()
 
 
 if __name__ == "__main__":
