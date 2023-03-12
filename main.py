@@ -1,14 +1,13 @@
 from client import Client
 
 
+def register_user():
+    ...
+
+
 def main():
-    client = Client(
-        login="admin",
-        password="admin1234",
-        name="Серёга",
-        email="admin@rvt.lv"
-    )
-    client.save()
+    clients = Client.get_clients()
+    print(*(client.__dict__.values() for client in clients), sep="\n")
 
 
 if __name__ == "__main__":
