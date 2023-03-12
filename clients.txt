@@ -1,2 +1,3 @@
 admin:admin1234:Серёга:n\a:admin@rvt.lv
 test:qwerty:Artem:n\a:n\a
+flexFlex:xelf:Flex:n\a:n\a
