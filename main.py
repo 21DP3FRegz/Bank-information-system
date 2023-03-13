@@ -18,7 +18,7 @@ clear = lambda: os.system('cls')
 def register_user():
     clear()
     print("\n========Create Account=========")
-    name = input("Name : ").strip()
+    name = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
 
     # get username
     logins = [client.login for client in Client.get_clients()]
@@ -36,15 +36,15 @@ def register_user():
 
     # get password
     while True:
-        # password = maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
-        password = input("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+        password = maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+        # password = input("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
 
         if len(password) < 4:
             print(colors.WARNING + "Password is too short!" + colors.END)
             continue
 
-        # if password != maskpass.advpass("Confirm Password : ").strip()
-        if password != input("Confirm Password : ").strip():
+        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
+        # if password != input("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
             print(colors.FAIL + "Password are different!" + colors.END)
             continue
         break
