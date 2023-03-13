@@ -2,7 +2,7 @@ FILE = "clients.txt"
 
 
 class Client:
-    def __init__(self, login: str, password: str, name: str, phone: int = None, email: str = None):
+    def __init__(self, login: str, password: str, name: str, phone: str = None, email: str = None):
         self.login = login
         self.password = password
         self.name = name
