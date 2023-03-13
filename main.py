@@ -1,15 +1,20 @@
-import sys
+import os
 from client import Client
 
 
 def register_user():
     name = input("Enter your Name : ")
-    print("10q! Now to continue registration Create a login:")
-    login = input()
-    # -_-
+    print("Thank you!")
+
+    logins = [client.login for client in Client.get_clients()]
+    while True:
+        login = input("\nCreate a login : ")
+        if (login not in logins):
+            break
+        print('\033[91m' + "This username is already taken!" + '\033[0m')
+
+    
     password = input("Create password : ")
-    # password != input("Confirm password : ") -> ...
-    print("U r successfully finished registration!!!")
 
     new_client = Client(
         name=name,
@@ -17,12 +22,14 @@ def register_user():
         password=password
     )
 
-    # phone or email?
+    # print("You can add your phone number for safe")
 
+    print("U r successfully finished registration!!!")
     new_client.save()
 
 
 def main():
+    os.system('cls')
     register_user()
 
     clients = Client.get_clients()
