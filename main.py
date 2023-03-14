@@ -15,15 +15,20 @@ class colors:
 clear = lambda: os.system('cls')
 
 
-def register_user():
+def register_user() -> Client:
     clear()
-    print("\n========Create Account=========")
+    print("\n======== Create Account =========")
+
+    get_login = lambda: input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
+    get_password = lambda: maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+
     name = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
+    age = int(input("\n" + colors.BLUE + "Age" + colors.END + " : "))
 
     # get username
-    logins = [client.login for client in Client.get_clients()]
+    logins: list = [client.login for client in Client.get_clients()]
     while True:
-        login = input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
+        login = get_login()
 
         if len(login) < 4:
             print(colors.WARNING + "Username is too short!" + colors.END)
@@ -43,45 +48,56 @@ def register_user():
             print(colors.WARNING + "Password is too short!" + colors.END)
             continue
 
-        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
+        if password != get_password():
         # if password != input("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
             print(colors.FAIL + "Password are different!" + colors.END)
             continue
         break
 
     new_client = Client(
-        name=name,
         login=login,
-        password=password
+        password=password,
+        name=name,
+        age=age
     )
 
     clear()
-    """
-    print("\nChose sth:")
-    print("[F] - Finish registration")
-    print("[P] - Add phone number")
-    print("[M] - Add e-mail address\n")
+    print(colors.GREEN + "\nYou are successfully registered!\n" + colors.END)
 
-    answer = input().strip().lower()
-    if answer[0] == 'p':
-        new_client.phone = input("Phone number : ")
-    elif answer[0] == 'm':
-        new_client.email = input("E-mail address : ")
-    """
-
-    print("You are successfully registered!\n")
     new_client.save()
+    return new_client
 
 
-def sign_in():
-    print("\n\n=========Login Page===========")
-    name = input("Username : ")
+def sign_in() -> Client:
+    clear()
+    print("\n========= Login Page ===========")
 
-    pwd = maskpass.askpass("Password : ")
+    get_login = lambda: input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
+    get_password = lambda: maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+
+    clients = Client.get_clients()
+    logins = [client.login for client in clients]
+
+    login = get_login()
+    while login not in logins:
+        print(colors.FAIL + "This username does not excists!" + colors.END)
+        login = get_login()
+    
+    user: Client = next((client for client in clients if client.login == login), None)
+    print(user.login, user.password)
+
+    password = get_password()
+    while password != user.password:
+        print(colors.FAIL + "Wrong password!" + colors.END)
+        password = get_password()
+
+    return user
 
 
 def main():
-    register_user()
+    # register_user()
+
+    sign_in()
 
     clients = Client.get_clients()
     print(*(client.__dict__.values() for client in clients), sep="\n")
