@@ -2,6 +2,7 @@ import os
 import maskpass  # to hide the password
 
 from client import Client
+from account import Account
 
 
 class colors:
@@ -22,13 +23,13 @@ def register_user() -> Client:
     get_login = lambda: input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
     get_password = lambda: maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
 
-    name = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
-    age = int(input("\n" + colors.BLUE + "Age" + colors.END + " : "))
+    name: str = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
+    age: int = int(input("\n" + colors.BLUE + "Age" + colors.END + " : "))
 
     # get username
     logins: list = [client.login for client in Client.get_clients()]
     while True:
-        login = get_login()
+        login: str = get_login()
 
         if len(login) < 4:
             print(colors.WARNING + "Username is too short!" + colors.END)
@@ -41,15 +42,13 @@ def register_user() -> Client:
 
     # get password
     while True:
-        password = maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
-        # password = input("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+        password: str = get_password()
 
         if len(password) < 4:
             print(colors.WARNING + "Password is too short!" + colors.END)
             continue
 
-        if password != get_password():
-        # if password != input("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
+        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm password" + colors.END + " : ").strip():
             print(colors.FAIL + "Password are different!" + colors.END)
             continue
         break
@@ -68,7 +67,7 @@ def register_user() -> Client:
     return new_client
 
 
-def sign_in() -> Client:
+def sign_in_user() -> Client:
     clear()
     print("\n========= Login Page ===========")
 
@@ -78,15 +77,14 @@ def sign_in() -> Client:
     clients = Client.get_clients()
     logins = [client.login for client in clients]
 
-    login = get_login()
+    login: str = get_login()
     while login not in logins:
         print(colors.FAIL + "This username does not excists!" + colors.END)
         login = get_login()
     
-    user: Client = next((client for client in clients if client.login == login), None)
-    print(user.login, user.password)
+    user: Client = next((client for client in clients if client.login == login), None)  # returns 1st user with login == login
 
-    password = get_password()
+    password: str = get_password()
     while password != user.password:
         print(colors.FAIL + "Wrong password!" + colors.END)
         password = get_password()
@@ -95,12 +93,23 @@ def sign_in() -> Client:
 
 
 def main():
-    # register_user()
-
-    sign_in()
-
-    clients = Client.get_clients()
-    print(*(client.__dict__.values() for client in clients), sep="\n")
+    clear()
+    print("Welcome!".center(50))
+    print("\n[" + colors.BLUE + "1" + colors.END + "] Sing in")
+    print("[" + colors.BLUE + "2" + colors.END + "] Registration")
+    
+    answer: str = input()
+    if answer == "1":
+        user: Client = sign_in_user()
+    elif answer == "2":
+        user: Client = register_user()
+    else:
+        exit()
+    
+    clear()
+    user.create_account()
+    clear()
+    print(*[account.__dict__.values() for account in Account.get_accounts()], sep="\n")
 
 
 if __name__ == "__main__":

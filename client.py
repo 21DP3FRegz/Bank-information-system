@@ -1,3 +1,5 @@
+from account import Account
+
 FILE = "clients.txt"
 
 
@@ -10,7 +12,16 @@ class Client:
 
     def save(self) -> None:
         with open(FILE, 'a', encoding="utf-8") as file:
-            file.write(":".join(str(value) for value in self.__dict__.values()) + "\n")
+            file.write(":".join(str(value) for value in self.__dict__.values()) + "\n") # "login:password:name:age\n" foreach client
+
+    def create_account(self) -> Account:
+        print("\n======== Create Account ==========")
+        new_account = Account(
+            holder=self.login,
+            name=input("\nCreate a name for this account:\n")
+        )
+        new_account.save()
+        return new_account
 
     @staticmethod
     def get_clients() -> list:
