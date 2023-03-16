@@ -90,7 +90,7 @@ def accounts_page(user: Client) -> None:
     while True:
         clear()
         print("\n========= Accounts ==========\n")
-        print("Name", "Balance", "Date appened", sep='\t')
+        print("Name", "Balance", "Day oppened", sep='\t')
         print('-' * 29)
         [print(account.name, account.balance, account.date_opened, sep='\t') for account in accounts]
 
@@ -121,20 +121,24 @@ def main():
     while True:
         clear()
         print("\n======== Home page =========\n")
-        print("\n[" + colors.BLUE + "1" + colors.END + "] My Accounts")
+        print("[" + colors.BLUE + "1" + colors.END + "] My Accounts")
         print("[" + colors.BLUE + "2" + colors.END + "] Create New Account")
         print("[" + colors.BLUE + "3" + colors.END + "] Delete Account")
-        print("[" + colors.BLUE + "4" + colors.END + "] My Payment")
+        print("[" + colors.BLUE + "4" + colors.END + "] My Payments")
         print("[" + colors.BLUE + "5" + colors.END + "] New Payments")
         print("[" + colors.BLUE + "6" + colors.END + "] Exit")
         
         answer: str = input("\nEnter Your choise : ").lower()[0]
         if answer == '1':
-            accounts_page(user)     # Доделать 
+            accounts_page(user)
         elif answer == '2':
+            clear()
             user.create_account()
         elif answer == '3':
-            pass
+            clear()
+            print("\n======== Delete Account ==========\n")
+            [print("[" + colors.BLUE, i+1, colors.END + "]", account.name) for i, account in enumerate(user.get_accounts())]
+            answer: str = input("\nWhich one account You want to delete : ")
         elif answer == '6':
             break
 

@@ -15,16 +15,22 @@ class Client:
             file.write(":".join(str(value) for value in self.__dict__.values()) + "\n") # "login:password:name:age\n" foreach client
 
     def create_account(self) -> Account:
-        print("\n======== Create Account ==========")
+        print("\n======== Create Account ==========\n")
         new_account = Account(
             holder=self.login,
-            name=input("\nCreate a name for this account:\n")
+            name=input("Create a name for this account:\n")
         )
         new_account.save()
         return new_account
     
-    def delete_account():
-        ...
+    def delete_account(self):
+        return
+        with open(FILE, "r") as f:
+            lines = f.readlines()
+        with open(FILE, "w") as f:
+            for line in lines:
+                if line.strip("\n") != "nickname_to_delete":
+                    f.write(line)
     
     def get_accounts(self) -> list:
         accounts = list(filter(lambda account: self.__is_mine(account), Account.get_accounts()))
@@ -35,7 +41,7 @@ class Client:
         with open(FILE, 'r', encoding="utf-8") as file:
             clients = list()
             for line in file.readlines():
-                login, password, name, age = line.replace('\n', '').split(':')
+                login, password, name, age = line.strip('\n').split(':')
                 clients.append(Client(login, password, name, int(age)))
             return clients
 
