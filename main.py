@@ -2,12 +2,10 @@ import os
 import maskpass  # to hide the password
 
 from client import Client
-from account import Account
 
 
 class colors:
     BLUE = '\033[94m'
-    GREEN = '\033[92m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     END = '\033[0m'
@@ -26,7 +24,7 @@ def register_user() -> Client:
     name: str = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
     age: int = int(input("\n" + colors.BLUE + "Age" + colors.END + " : "))
 
-    # get username
+    # get valid username
     logins: list = [client.login for client in Client.get_clients()]
     while True:
         login: str = get_login()
@@ -40,7 +38,7 @@ def register_user() -> Client:
             continue
         break
 
-    # get password
+    # get valid password
     while True:
         password: str = get_password()
 
@@ -48,7 +46,7 @@ def register_user() -> Client:
             print(colors.WARNING + "Password is too short!" + colors.END)
             continue
 
-        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm password" + colors.END + " : ").strip():
+        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
             print(colors.FAIL + "Password are different!" + colors.END)
             continue
         break
@@ -59,10 +57,6 @@ def register_user() -> Client:
         name=name,
         age=age
     )
-
-    clear()
-    print(colors.GREEN + "\nYou are successfully registered!\n" + colors.END)
-
     new_client.save()
     return new_client
 
@@ -81,35 +75,68 @@ def sign_in_user() -> Client:
     while login not in logins:
         print(colors.FAIL + "This username does not excists!" + colors.END)
         login = get_login()
-    
-    user: Client = next((client for client in clients if client.login == login), None)  # returns 1st user with login == login
+
+    user: Client = next((client for client in clients if client.login == login), None)
 
     password: str = get_password()
     while password != user.password:
         print(colors.FAIL + "Wrong password!" + colors.END)
         password = get_password()
-
     return user
+
+
+def accounts_page(user: Client) -> None:
+    accounts = user.get_accounts()
+    while True:
+        clear()
+        print("\n========= Accounts ==========\n")
+        print("Name", "Balance", "Date appened", sep='\t')
+        print('-' * 29)
+        [print(account.name, account.balance, account.date_opened, sep='\t') for account in accounts]
+
+        print("\n[" + colors.BLUE + "1" + colors.END + "] Sort")
+        print("[" + colors.BLUE + "2" + colors.END + "] Search")
+        print("[" + colors.BLUE + "3" + colors.END + "] Make a Deposit")
+        print("[" + colors.BLUE + "4" + colors.END + "] Back")
+
+        answer: str = input("\nEnter Your choise : ").lower()[0]
+        if answer == '4':
+            return
 
 
 def main():
     clear()
     print("Welcome!".center(50))
-    print("\n[" + colors.BLUE + "1" + colors.END + "] Sing in")
+    print("\n[" + colors.BLUE + "1" + colors.END + "] Sing/In")
     print("[" + colors.BLUE + "2" + colors.END + "] Registration")
-    
-    answer: str = input()
+
+    answer: str = input("\nEnter Your choise : ")[0]
     if answer == "1":
         user: Client = sign_in_user()
     elif answer == "2":
         user: Client = register_user()
     else:
         exit()
-    
-    clear()
-    user.create_account()
-    clear()
-    print(*[account.__dict__.values() for account in Account.get_accounts()], sep="\n")
+
+    while True:
+        clear()
+        print("\n======== Home page =========\n")
+        print("\n[" + colors.BLUE + "1" + colors.END + "] My Accounts")
+        print("[" + colors.BLUE + "2" + colors.END + "] Create New Account")
+        print("[" + colors.BLUE + "3" + colors.END + "] Delete Account")
+        print("[" + colors.BLUE + "4" + colors.END + "] My Payment")
+        print("[" + colors.BLUE + "5" + colors.END + "] New Payments")
+        print("[" + colors.BLUE + "6" + colors.END + "] Exit")
+        
+        answer: str = input("\nEnter Your choise : ").lower()[0]
+        if answer == '1':
+            accounts_page(user)     # Доделать 
+        elif answer == '2':
+            user.create_account()
+        elif answer == '3':
+            pass
+        elif answer == '6':
+            break
 
 
 if __name__ == "__main__":

@@ -22,6 +22,13 @@ class Client:
         )
         new_account.save()
         return new_account
+    
+    def delete_account():
+        ...
+    
+    def get_accounts(self) -> list:
+        accounts = list(filter(lambda account: self.__is_mine(account), Account.get_accounts()))
+        return accounts
 
     @staticmethod
     def get_clients() -> list:
@@ -31,3 +38,6 @@ class Client:
                 login, password, name, age = line.replace('\n', '').split(':')
                 clients.append(Client(login, password, name, int(age)))
             return clients
+
+    def __is_mine(self, account: Account) -> bool:
+        return True if account.holder == self.login else False
