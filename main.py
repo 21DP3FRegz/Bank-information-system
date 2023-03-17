@@ -2,27 +2,20 @@ import os
 import maskpass  # to hide the password
 
 from client import Client
+from colors import Colors
 
-
-class colors:
-    BLUE = '\033[94m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    END = '\033[0m'
-
-
-clear = lambda: os.system('cls')
+clear = lambda: os.system('cls') if os.name == "nt" else os.system('clear')
 
 
 def register_user() -> Client:
     clear()
     print("\n======== Create Account =========")
 
-    get_login = lambda: input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
-    get_password = lambda: maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+    get_login = lambda: input("\n" + Colors.BLUE + "Username" + Colors.END + " : ").strip().lower()
+    get_password = lambda: maskpass.advpass("\n" + Colors.BLUE + "Password" + Colors.END + " : ").strip()
 
-    name: str = input("\n" + colors.BLUE + "Name" + colors.END + " : ").strip()
-    age: int = int(input("\n" + colors.BLUE + "Age" + colors.END + " : "))
+    name: str = input("\n" + Colors.BLUE + "Name" + Colors.END + " : ").strip()
+    age: int = int(input("\n" + Colors.BLUE + "Age" + Colors.END + " : "))
 
     # get valid username
     logins: list = [client.login for client in Client.get_clients()]
@@ -30,11 +23,7 @@ def register_user() -> Client:
         login: str = get_login()
 
         if len(login) < 4:
-            print(colors.WARNING + "Username is too short!" + colors.END)
-            continue
-
-        if login in logins:
-            print(colors.FAIL + "This username is already taken!" + colors.END)
+            print(Colors.WARNING + "Username is too short!" + Colors.END)
             continue
         break
 
@@ -43,11 +32,11 @@ def register_user() -> Client:
         password: str = get_password()
 
         if len(password) < 4:
-            print(colors.WARNING + "Password is too short!" + colors.END)
+            print(Colors.WARNING + "Password is too short!" + Colors.END)
             continue
 
-        if password != maskpass.advpass("\n" + colors.BLUE + "Confirm Password" + colors.END + " : ").strip():
-            print(colors.FAIL + "Password are different!" + colors.END)
+        if password != maskpass.advpass("\n" + Colors.BLUE + "Confirm Password" + Colors.END + " : ").strip():
+            print(Colors.FAIL + "Password are different!" + Colors.END)
             continue
         break
 
@@ -65,22 +54,22 @@ def sign_in_user() -> Client:
     clear()
     print("\n========= Login Page ===========")
 
-    get_login = lambda: input("\n" + colors.BLUE + "Username" + colors.END + " : ").strip().lower()
-    get_password = lambda: maskpass.advpass("\n" + colors.BLUE + "Password" + colors.END + " : ").strip()
+    get_login = lambda: input("\n" + Colors.BLUE + "Username" + Colors.END + " : ").strip().lower().replace(":", "")
+    get_password = lambda: maskpass.advpass("\n" + Colors.BLUE + "Password" + Colors.END + " : ").strip()
 
     clients = Client.get_clients()
     logins = [client.login for client in clients]
 
     login: str = get_login()
     while login not in logins:
-        print(colors.FAIL + "This username does not excists!" + colors.END)
+        print(Colors.FAIL + "This username does not excists!" + Colors.END)
         login = get_login()
 
     user: Client = next((client for client in clients if client.login == login), None)
 
     password: str = get_password()
     while password != user.password:
-        print(colors.FAIL + "Wrong password!" + colors.END)
+        print(Colors.FAIL + "Wrong password!" + Colors.END)
         password = get_password()
     return user
 
@@ -89,17 +78,17 @@ def accounts_page(user: Client) -> None:
     accounts = user.get_accounts()
     while True:
         clear()
-        print("\n========= Accounts ==========\n")
-        print("Name", "Balance", "Day oppened", sep='\t')
-        print('-' * 29)
-        [print(account.name, account.balance, account.date_opened, sep='\t') for account in accounts]
+        print("\n\t\t========= Accounts ==========\n")
+        print('{:25s} {:20s} {:30s} '.format("Name", "Balance", "Day oppened"))
+        print('-' * 75)
+        [print("{:25s} {:20s} {:30s} ".format(account.name, str(account.balance), str(account.date_opened))) for account in accounts]
 
-        print("\n[" + colors.BLUE + "1" + colors.END + "] Sort")
-        print("[" + colors.BLUE + "2" + colors.END + "] Search")
-        print("[" + colors.BLUE + "3" + colors.END + "] Make a Deposit")
-        print("[" + colors.BLUE + "4" + colors.END + "] Back")
+        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort")
+        print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
+        print("[" + Colors.BLUE + "3" + Colors.END + "] Make a Deposit")
+        print("[" + Colors.BLUE + "4" + Colors.END + "] Back")
 
-        answer: str = input("\nEnter Your choise : ").lower()[0]
+        answer: str = input("\nEnter Your choise : ")
         if answer == '4':
             return
 
@@ -107,10 +96,10 @@ def accounts_page(user: Client) -> None:
 def main():
     clear()
     print("Welcome!".center(50))
-    print("\n[" + colors.BLUE + "1" + colors.END + "] Sing/In")
-    print("[" + colors.BLUE + "2" + colors.END + "] Registration")
+    print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sing/In")
+    print("[" + Colors.BLUE + "2" + Colors.END + "] Registration")
 
-    answer: str = input("\nEnter Your choise : ")[0]
+    answer: str = input("\nEnter Your choise : ")
     if answer == "1":
         user: Client = sign_in_user()
     elif answer == "2":
@@ -121,25 +110,22 @@ def main():
     while True:
         clear()
         print("\n======== Home page =========\n")
-        print("[" + colors.BLUE + "1" + colors.END + "] My Accounts")
-        print("[" + colors.BLUE + "2" + colors.END + "] Create New Account")
-        print("[" + colors.BLUE + "3" + colors.END + "] Delete Account")
-        print("[" + colors.BLUE + "4" + colors.END + "] My Payments")
-        print("[" + colors.BLUE + "5" + colors.END + "] New Payments")
-        print("[" + colors.BLUE + "6" + colors.END + "] Exit")
+        print("[" + Colors.BLUE + "1" + Colors.END + "] My Accounts")
+        print("[" + Colors.BLUE + "2" + Colors.END + "] Create New Account")
+        print("[" + Colors.BLUE + "3" + Colors.END + "] Delete Account")
+        print("[" + Colors.BLUE + "4" + Colors.END + "] My Payments")
+        print("[" + Colors.BLUE + "5" + Colors.END + "] New Payments")
+        print("[" + Colors.BLUE + "6" + Colors.END + "] Exit")
         
-        answer: str = input("\nEnter Your choise : ").lower()[0]
+        answer: str = input("\nEnter Your choise : ")
         if answer == '1':
             accounts_page(user)
         elif answer == '2':
-            clear()
             user.create_account()
         elif answer == '3':
-            clear()
-            print("\n======== Delete Account ==========\n")
-            [print("[" + colors.BLUE, i+1, colors.END + "]", account.name) for i, account in enumerate(user.get_accounts())]
-            answer: str = input("\nWhich one account You want to delete : ")
+            user.delete_account()
         elif answer == '6':
+            clear()
             break
 
 
