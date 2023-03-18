@@ -1,11 +1,9 @@
-import os
-
+from console import clear
 from account import Account
 from colors import Colors
 
 
 FILE = "clients.txt"
-clear = lambda: os.system('cls') if os.name == "nt" else os.system('clear')
 
 
 class Client:
