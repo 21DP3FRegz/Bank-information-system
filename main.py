@@ -51,6 +51,18 @@ def get_valid_password() -> str:
         return password
 
 
+def sort_accounts(accounts: list) -> list:
+    while True:
+        clear()
+        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort by name")
+        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort by balance")
+        print("[" + Colors.BLUE + "3" + Colors.END + "] Sort by date")
+
+        answer: str = input("\nEnter Your choise : ")
+        if answer == '1':
+            sorted_accounts = sorted(accounts, key=lambda account: account.name)
+            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+
 
 def register_user() -> Client:
     clear()
@@ -120,6 +132,8 @@ def accounts_page(user: Client) -> None:
         print("[" + Colors.BLUE + "4" + Colors.END + "] Back")
 
         answer: str = input("\nEnter Your choise : ")
+        if answer == '1':
+            accounts = sort_accounts(accounts)
         if answer == '4':
             return
 
