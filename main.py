@@ -63,6 +63,14 @@ def sort_accounts(accounts: list) -> list:
             sorted_accounts = sorted(accounts, key=lambda account: account.name)
             return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
 
+        if answer == '2':
+            sorted_accounts = sorted(accounts, key=lambda account: account.balance)
+            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+        
+        if answer == '3':
+            sorted_accounts = sorted(accounts, key=lambda account: account.date_opened)
+            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+
 
 def register_user() -> Client:
     clear()
