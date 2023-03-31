@@ -1,5 +1,6 @@
-from string import punctuation
+from string import punctuation, ascii_letters, digits
 import maskpass  # to hide the password
+import keyboard
 
 from console import clear
 from client import Client
@@ -61,15 +62,24 @@ def sort_accounts(accounts: list) -> list:
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
             sorted_accounts = sorted(accounts, key=lambda account: account.name)
-            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
 
         if answer == '2':
             sorted_accounts = sorted(accounts, key=lambda account: account.balance)
-            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
         
         if answer == '3':
             sorted_accounts = sorted(accounts, key=lambda account: account.date_opened)
-            return sorted_accounts if sorted_accounts != accounts else reversed(sorted_accounts)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
+
+
+def search_accounts_by_name(accounts: list):
+    input: str = ''
+    while True:
+        clear()
+        print(">>> " + input)
+        key_pressed = keyboard.on_release_key()
+        input += key_pressed if key_pressed in ascii_letters + digits else ''
 
 
 def register_user() -> Client:
@@ -117,7 +127,6 @@ def sign_in_user() -> Client:
 
 def accounts_page(user: Client) -> None:
     accounts = user.get_accounts()
-    
     if len(accounts) == 0:
         clear()
         print(Colors.WARNING + "You do not have a bank account at the moment." + Colors.END)
@@ -142,6 +151,8 @@ def accounts_page(user: Client) -> None:
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
             accounts = sort_accounts(accounts)
+        if answer == '2':
+            accounts = search_accounts_by_name(accounts)
         if answer == '4':
             return
 
