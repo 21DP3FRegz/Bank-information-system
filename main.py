@@ -52,6 +52,27 @@ def get_valid_password() -> str:
         return password
 
 
+def sort_accounts(accounts: list) -> list:
+    while True:
+        clear()
+        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort by name")
+        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort by balance")
+        print("[" + Colors.BLUE + "3" + Colors.END + "] Sort by date")
+
+        answer: str = input("\nEnter Your choise : ")
+        if answer == '1':
+            sorted_accounts = sorted(accounts, key=lambda account: account.name)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
+
+        if answer == '2':
+            sorted_accounts = sorted(accounts, key=lambda account: account.balance)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
+        
+        if answer == '3':
+            sorted_accounts = sorted(accounts, key=lambda account: account.date_opened)
+            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
+
+
 def register_user() -> Client:
     clear()
     print("\n======== Create Account =========\n")
@@ -161,7 +182,6 @@ def deposit_page(user: Client, warning='') -> None:
 
 def accounts_page(user: Client) -> None:
     accounts = user.get_accounts()
-    
     if len(accounts) == 0:
         clear()
         print(Colors.WARNING + "You do not have a bank account at the moment." + Colors.END)
