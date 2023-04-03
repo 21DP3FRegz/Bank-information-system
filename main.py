@@ -21,6 +21,13 @@ def get_natural_number(message: str, min_value=1) -> int:
         return num
 
 
+def get_password(message: str) -> str:
+    try:
+        return maskpass.advpass(message).strip()
+    except KeyboardInterrupt:
+        pass
+
+
 def get_valid_login() -> str:
     get_user_input = lambda: input("\n" + Colors.BLUE + "Username" + Colors.END + " : ").strip().lower()
     logins: list = [client.login for client in Client.get_clients()]
@@ -39,14 +46,12 @@ def get_valid_login() -> str:
 
 
 def get_valid_password() -> str:
-    get_user_input = lambda: maskpass.advpass("\n" + Colors.BLUE + "Password" + Colors.END + " : ").strip()
-    confirm_password = lambda: maskpass.advpass("\n" + Colors.BLUE + "Confirm Password" + Colors.END + " : ").strip()
     while True:
-        password: str = get_user_input()
+        password: str = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
         if len(password) < 6:
             print(Colors.WARNING + "Password must be at least 6 symbols!" + Colors.END)
             continue
-        if password != confirm_password():
+        if password != get_password("\n" + Colors.BLUE + "Confirm Password" + Colors.END + " : "):
             print(Colors.FAIL + "Passwords are different!" + Colors.END)
             continue
         return password
@@ -97,7 +102,6 @@ def sign_in_user() -> Client:
     print("\n========= Login Page ===========")
 
     get_login = lambda: input("\n" + Colors.BLUE + "Username" + Colors.END + " : ").strip().lower()
-    get_password = lambda: maskpass.advpass("\n" + Colors.BLUE + "Password" + Colors.END + " : ").strip()
 
     clients = Client.get_clients()
     logins = [client.login for client in clients]
@@ -109,10 +113,11 @@ def sign_in_user() -> Client:
 
     user: Client = next((client for client in clients if client.login == login), None)
 
-    password: str = get_password()
+    password: str = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
     while password != user.password:
-        print(Colors.FAIL + "Wrong password!" + Colors.END)
-        password = get_password()
+        if password != '':
+            print(Colors.FAIL + "Wrong password!" + Colors.END)
+        password = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
     return user
 
 
@@ -185,7 +190,7 @@ def accounts_page(user: Client) -> None:
     if len(accounts) == 0:
         clear()
         print(Colors.WARNING + "You do not have a bank account at the moment." + Colors.END)
-        answer: str = input("Do You want to create one? " + Colors.BLUE + "[Y/n]\n" + Colors.END).lower().strip()
+        answer: str = input("\nDo You want to create one? " + Colors.BLUE + "[Y/n]\n" + Colors.END).lower().strip()
         if answer == 'y' or answer == '':
             user.create_account()
             accounts = user.get_accounts()
