@@ -1,7 +1,7 @@
 from console import clear
 from account import Account
 from colors import Colors
-
+from id import ID
 
 FILE = "clients.txt"
 
@@ -25,6 +25,7 @@ class Client:
         clear()
         print("\n======== Create Account ==========\n")
         new_account = Account(
+            id=ID.create(16),
             holder=self.login,
             name=input("Create a name for this account:\n")
         )
