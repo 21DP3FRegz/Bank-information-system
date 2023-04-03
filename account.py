@@ -1,5 +1,4 @@
 import datetime
-from id import ID
 
 FILE = "accounts.txt"
 
@@ -7,9 +6,9 @@ FILE = "accounts.txt"
 class Account:
     def __init__(
             self,
+            id: str,
             holder: str,
             name: str,
-            id: str = ID.create(16),
             date_opened = datetime.date.today(),
             balance: float = 0
         ):
@@ -45,5 +44,5 @@ class Account:
             for line in file.readlines():
                 id, holder, balance, date_opened, name = line.strip('\n').split(':')
                 date_opened = datetime.datetime.strptime(date_opened.replace('-', ''), "%Y%m%d").strftime("%Y-%m-%d")
-                accounts.append(Account(holder, name, id, date_opened, float(balance)))
+                accounts.append(Account(id, holder, name, date_opened, float(balance)))
             return accounts
