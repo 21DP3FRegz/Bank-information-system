@@ -1,9 +1,11 @@
 import datetime
 
+from savable import Savable
+
 FILE = "accounts.txt"
 
 
-class Account:
+class Account(Savable):
     def __init__(
             self,
             id: str,
@@ -19,11 +21,11 @@ class Account:
         self.name = name
 
     def save(self) -> None:
-        with open(FILE, 'a', encoding="utf-8") as file:
-            file.write(":".join(str(value) for value in self.__dict__.values()) + "\n")
+        super().save(FILE)
     
     def update_balance(self, amount: float) -> None:
         self.balance += amount
+        self.balance = round(self.balance, 2)
         Account.delete_accont_by_id(self.id)
         self.save()
 

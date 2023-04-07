@@ -3,9 +3,7 @@ import maskpass  # to hide the password
 
 from console import clear
 from client import Client
-from account import Account
 from colors import Colors
-from validation import is_float
 
 
 def get_natural_number(message: str, min_value=1) -> int:
@@ -82,16 +80,12 @@ def register_user() -> Client:
     clear()
     print("\n======== Create Account =========\n")
 
-    name: str = input("" + Colors.BLUE + "Name" + Colors.END + " : ").strip().translate(str.maketrans('', '', string.punctuation))
-    age: int = get_natural_number("\n" + Colors.BLUE + "Age" + Colors.END + " : ")
     login: str = get_valid_login()
     password: str = get_valid_password()
 
     new_client = Client(
         login=login,
         password=password,
-        name=name,
-        age=age
     )
     new_client.save()
     return new_client
@@ -146,43 +140,13 @@ def filter_accounts_by_name(accounts: list):
     while True:
         clear()
         print("Please enter the name of the account or the string that it can contain:")
-        answer: str = input(">>> ")
+        answer: str = input(">>> ").lower()
         
         specific_account = next((account for account in accounts if account.name == answer), None)
         if not specific_account is None:
             return [specific_account]
         else:
-            return list(filter(lambda account: (answer in account.name), accounts))
-
-
-def deposit_page(user: Client, warning='') -> None:
-    clear()
-    answer: str = user.choose_account("\nWhich account do you want to deposit into?\n>>> ")
-    
-    accounts = user.get_accounts()
-    if answer == 'b':
-        return
-    if not answer.isdecimal():
-        return deposit_page(user, warning=Colors.WARNING + "Please input numbers!" + Colors.END)
-    
-    index: int = int(answer) - 1
-    if not 0 <= index < len(accounts):
-        return deposit_page(user, warning=Colors.WARNING + "Index out of range!" + Colors.END)
-    
-    account: Account = accounts[index]
-
-    while True:
-        amount: str = input("\nEnter the deposit amount : ")
-        if not is_float(amount):
-            print(Colors.WARNING + "Please input digits!" + Colors.END)
-            continue
-        amount = round(float(amount), 2)
-        if amount < 0:
-            print(Colors.WARNING + "Please input positive digits!" + Colors.END)
-            continue
-        
-        account.update_balance(amount)
-        return
+            return list(filter(lambda account: (answer in account.name.lower()), accounts))
 
 
 def accounts_page(user: Client) -> None:
@@ -198,10 +162,10 @@ def accounts_page(user: Client) -> None:
     while True:
         clear()
         print("\n\t\t========= Accounts ==========\n")
-        print('{:25s} {:25s} {:25s} '.format("Name", "Balance", "Day oppened"))
-        print('-' * 75)
-        [print("{:25s} {:25s} {:25s} ".format(account.name, str(account.balance) + ' $', str(account.date_opened))) for account in accounts]
-        print('\n' + '-' * 75)
+        print('{:25s} {:25s} {:25s} {:25s}'.format("Name", "Balance", "Day oppened", "ID"))
+        print('-' * 100)
+        [print("{:25s} {:25s} {:25s} {:25s}".format(account.name, str(account.balance) + ' $', str(account.date_opened), account.id)) for account in accounts]
+        print('\n' + '-' * 100)
 
         print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort")
         print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
@@ -217,7 +181,7 @@ def accounts_page(user: Client) -> None:
         elif answer == '3':
             accounts = user.get_accounts()
         elif answer == '4':
-            deposit_page(user)
+            user.make_deposit()
             accounts = user.get_accounts()
         elif answer == '5':
             return
@@ -243,8 +207,8 @@ def main():
         print("[" + Colors.BLUE + "1" + Colors.END + "] View My Accounts")
         print("[" + Colors.BLUE + "2" + Colors.END + "] Create New Account")
         print("[" + Colors.BLUE + "3" + Colors.END + "] Delete Account")
-        print("[" + Colors.BLUE + "4" + Colors.END + "] My Payments")
-        print("[" + Colors.BLUE + "5" + Colors.END + "] New Payments")
+        print("[" + Colors.BLUE + "4" + Colors.END + "] My Transactions")
+        print("[" + Colors.BLUE + "5" + Colors.END + "] New Transaction")
         print("[" + Colors.BLUE + "6" + Colors.END + "] Exit")
         
         answer: str = input("\nEnter Your choise : ")
@@ -254,6 +218,8 @@ def main():
             user.create_account()
         elif answer == '3':
             user.delete_account()
+        elif answer == '5':
+            user.make_transaction()
         elif answer == '6':
             clear()
             break

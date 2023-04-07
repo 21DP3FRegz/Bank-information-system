@@ -1,8 +1,26 @@
 import datetime
 
+from savable import Savable
 
-class Transaction:
-    def __init__(self, amount: float):
+FILE = "transactions.txt"
+
+
+class Transaction(Savable):
+    def __init__(
+            self,
+            id: str,
+            amount: float,
+            recipient: str,
+            sender: str,
+            info: str,
+            date = datetime.date.today(),
+        ):
+        self.id = id
         self.amount = amount
-        self.date = datetime.date.today()
+        self.recipient = recipient
+        self.sender = sender
+        self.info = info
+        self.date = date
 
+    def save(self) -> None:
+        super().save(FILE)
