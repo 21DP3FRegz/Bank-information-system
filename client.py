@@ -18,7 +18,7 @@ class Client(Savable):
         super().save(FILE)
 
     def get_accounts(self) -> list:
-        accounts = list(filter(lambda account: self.__is_mine(account), Account.get_accounts()))
+        accounts = list(filter(lambda account: self.__is_mine_account(account), Account.get_accounts()))
         return accounts
 
     def create_account(self) -> Account:
@@ -68,11 +68,11 @@ class Client(Savable):
 
         while True:
             amount = input("Enter the transaction amount: ")
-            if is_float(amount) and int(amount) > 0:
+            if is_float(amount) and float(amount) > 0:
                 break
             print(Colors.WARNING + "The deposit amount should be a positive number." + Colors.END + " Try again.")
             
-        account.update_balance(amount)
+        account.update_balance(float(amount))
         return
     
     def make_transaction(self) -> None:
@@ -88,13 +88,13 @@ class Client(Savable):
         recipient = input("Enter the id of the recipient of the transaction: ")
         while True:     # get amount
             amount = input("Enter the transaction amount: ")
-            if not is_float(amount) or int(amount) < 0:
+            if not is_float(amount) or float(amount) < 0:
                 print(Colors.WARNING + "The transaction amount should be a positive number." + Colors.END + " Try again.")
                 continue
-            if int(amount) > account.balance:
+            if float(amount) > account.balance:
                 print(Colors.WARNING + "You don't have that much money." + Colors.END)
                 continue
-            amount = int(amount)
+            amount = float(amount)
             break
         
         transaction = Transaction(
@@ -106,6 +106,7 @@ class Client(Savable):
         )
         transaction.save()
         account.update_balance(-amount)
+        Account.update_accounts_balance()
     
     @staticmethod
     def get_clients() -> list:
@@ -116,5 +117,5 @@ class Client(Savable):
                 clients.append(Client(login, password))
             return clients
 
-    def __is_mine(self, account: Account) -> bool:
+    def __is_mine_account(self, account: Account) -> bool:
         return True if account.holder == self.login else False

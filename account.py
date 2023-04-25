@@ -1,6 +1,7 @@
 import datetime
 
 from savable import Savable
+from transaction import Transaction
 
 FILE = "accounts.txt"
 
@@ -30,7 +31,7 @@ class Account(Savable):
         self.save()
 
     @staticmethod
-    def delete_accont_by_id(id: str):
+    def delete_accont_by_id(id: str) -> None:
         with open(FILE, "r", encoding="utf-8") as f:
             lines = f.readlines()
         with open(FILE, "w", encoding="utf-8") as f:
@@ -48,3 +49,18 @@ class Account(Savable):
                 date_opened = datetime.datetime.strptime(date_opened.replace('-', ''), "%Y%m%d").strftime("%Y-%m-%d")
                 accounts.append(Account(id, holder, name, date_opened, float(balance)))
             return accounts
+    
+    @staticmethod
+    def update_accounts_balance() -> None:
+        accounts = Account.get_accounts()
+        last_transaction = Transaction.get_transactions()[-1]
+        for account in accounts:
+            if account.__is_transaction_recipient(last_transaction):
+                account.update_balance(last_transaction.amount)
+    
+    def __is_transaction_sender(self, transaction: Transaction) -> bool:
+        return True if transaction.sender == self.id else False
+    
+    def __is_transaction_recipient(self, transaction: Transaction) -> bool:
+        return True if transaction.recipient == self.id else False
+

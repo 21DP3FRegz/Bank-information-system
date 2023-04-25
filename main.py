@@ -1,3 +1,5 @@
+import setup
+
 import string
 import maskpass  # to hide the password
 
@@ -53,6 +55,18 @@ def get_valid_password() -> str:
             print(Colors.FAIL + "Passwords are different!" + Colors.END)
             continue
         return password
+
+
+def print_table(dicts: list[dict]) -> None:
+    if len(dicts) == 0:
+        return
+    for key in dicts[0].keys():
+        print('{:25s}'.format(str(key).replace('_', ' ').capitalize()), end='')
+    print('\n' + '-' * 25 * len(dicts[0]))
+    for dict in dicts:
+        [print('{:25s}'.format(value), end='') for value in dict.values()]
+        print()
+    print('-' * 25 * len(dicts[0]) + '\n')
 
 
 def sort_accounts(accounts: list) -> list:
@@ -150,9 +164,9 @@ def filter_accounts_by_name(accounts: list):
 
 
 def accounts_page(user: Client) -> None:
+    clear()
     accounts = user.get_accounts()
     if len(accounts) == 0:
-        clear()
         print(Colors.WARNING + "You do not have a bank account at the moment." + Colors.END)
         answer: str = input("\nDo You want to create one? " + Colors.BLUE + "[Y/n]\n" + Colors.END).lower().strip()
         if answer == 'y' or answer == '':
@@ -161,13 +175,9 @@ def accounts_page(user: Client) -> None:
     
     while True:
         clear()
-        print("\n\t\t========= Accounts ==========\n")
-        print('{:25s} {:25s} {:25s} {:25s}'.format("Name", "Balance", "Day oppened", "ID"))
-        print('-' * 100)
-        [print("{:25s} {:25s} {:25s} {:25s}".format(account.name, str(account.balance) + ' $', str(account.date_opened), account.id)) for account in accounts]
-        print('\n' + '-' * 100)
-
-        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort")
+        accounts_info = [{"name": account.name, "balance": str(account.balance) + ' $', "day_oppened": str(account.date_opened), "id": account.id} for account in accounts]
+        print_table(accounts_info)
+        print("[" + Colors.BLUE + "1" + Colors.END + "] Sort")
         print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
         print("[" + Colors.BLUE + "3" + Colors.END + "] Refresh")
         print("[" + Colors.BLUE + "4" + Colors.END + "] Make a Deposit")
@@ -186,6 +196,22 @@ def accounts_page(user: Client) -> None:
         elif answer == '5':
             return
 
+
+def transactions_page():
+    while True:
+        clear()
+        print("\n\t\t========= Transactions ==========\n")
+        print('{:25s} {:25s} {:25s} {:25s}'.format("Amount", "From", "To", "Information"))
+
+        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort")
+        print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
+
+        answer: str = input("\nEnter Your choise : ")
+        if answer == '1':
+            pass
+        elif answer == '2':
+            pass
+    
 
 def main():
     clear()
@@ -218,6 +244,8 @@ def main():
             user.create_account()
         elif answer == '3':
             user.delete_account()
+        elif answer == '4':
+            transactions_page()
         elif answer == '5':
             user.make_transaction()
         elif answer == '6':

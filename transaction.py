@@ -24,3 +24,13 @@ class Transaction(Savable):
 
     def save(self) -> None:
         super().save(FILE)
+        
+    @staticmethod
+    def get_transactions() -> list:
+        with open(FILE, 'r', encoding="utf-8") as file:
+            transactions = list()
+            for line in file.readlines():
+                id, amount, recipient, sender, info, date = line.strip('\n').split(':')
+                date = datetime.datetime.strptime(date.replace('-', ''), "%Y%m%d").strftime("%Y-%m-%d")
+                transactions.append(Transaction(id, float(amount), recipient, sender, info, date))
+            return transactions
