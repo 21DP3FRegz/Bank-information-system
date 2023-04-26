@@ -29,6 +29,9 @@ class Account(Savable):
         self.balance = round(self.balance, 2)
         Account.delete_accont_by_id(self.id)
         self.save()
+    
+    def get_my_transactions(self) -> list[Transaction]:
+        return list(filter(lambda transaction: self.__is_my_transaction(transaction), Transaction.get_transactions()))
 
     @staticmethod
     def delete_accont_by_id(id: str) -> None:
@@ -58,6 +61,9 @@ class Account(Savable):
             if account.__is_transaction_recipient(last_transaction):
                 account.update_balance(last_transaction.amount)
     
+    def __is_my_transaction(self, transaction: Transaction) -> bool:
+        return self.__is_transaction_sender(transaction) or self.__is_transaction_recipient(transaction)
+
     def __is_transaction_sender(self, transaction: Transaction) -> bool:
         return True if transaction.sender == self.id else False
     
