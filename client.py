@@ -17,9 +17,14 @@ class Client(Savable):
     def save(self) -> None:
         super().save(FILE)
 
-    def get_accounts(self) -> list:
-        accounts = list(filter(lambda account: self.__is_mine_account(account), Account.get_accounts()))
-        return accounts
+    def get_accounts(self) -> list[Account]:
+        return list(filter(lambda account: self.__is_mine_account(account), Account.get_accounts()))
+    
+    def get_transactions(self):
+        transactions: list = []
+        for account in  self.get_accounts():
+            transactions.extend(account.get_my_transactions())
+        return transactions
 
     def create_account(self) -> Account:
         clear()
@@ -43,6 +48,15 @@ class Client(Savable):
         Account.delete_accont_by_id(id_to_delete)
     
     def choose_account(self, message: str, warning: str = '') -> Account:
+        """ Prints user accounts and asks to choose one.
+
+        Args:
+            message (str): Prints when user input his answer.
+            warning (str, optional): Prints in case error. Defaults to ''.
+
+        Returns:
+            Account: choosen by user.
+        """
         accounts = self.get_accounts()
         clear()
         [print("[" + Colors.BLUE, i+1, Colors.END + "]", account.name) for i, account in enumerate(accounts)]
@@ -61,13 +75,15 @@ class Client(Savable):
         return accounts[index]
     
     def make_deposit(self) -> None:
+        """User chooses account and making a deposit to it.
+        """
         clear()    
         account: Account = self.choose_account("\nWhich account do you want to deposit into?\n>>> ")
         if account is None:
             return
 
         while True:
-            amount = input("Enter the transaction amount: ")
+            amount = input("Enter the deposit amount: ")
             if is_float(amount) and float(amount) > 0:
                 break
             print(Colors.WARNING + "The deposit amount should be a positive number." + Colors.END + " Try again.")
@@ -76,6 +92,8 @@ class Client(Savable):
         return
     
     def make_transaction(self) -> None:
+        """User chooses from witch account and who will be recipient. And making a transaction.
+        """
         clear()
         print("\n======== New Transaction ==========\n")
         
@@ -110,6 +128,11 @@ class Client(Savable):
     
     @staticmethod
     def get_clients() -> list:
+        """ Get all clients from file.
+
+        Returns:
+            Clients: List of clients. 
+        """
         with open(FILE, 'r', encoding="utf-8") as file:
             clients = list()
             for line in file.readlines():
