@@ -175,8 +175,10 @@ def accounts_page(user: Client) -> None:
     
     while True:
         clear()
-        accounts_info = [{"name": account.name, "balance": str(account.balance) + ' $', "day_oppened": str(account.date_opened), "id": account.id} for account in accounts]
+        accounts_info: list[dict] = [{"name": account.name, "balance": str(account.balance) + ' $', "day_oppened": str(account.date_opened), "id": account.id} for account in accounts]
+        
         print_table(accounts_info)
+
         print("[" + Colors.BLUE + "1" + Colors.END + "] Sort")
         print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
         print("[" + Colors.BLUE + "3" + Colors.END + "] Refresh")
@@ -197,20 +199,33 @@ def accounts_page(user: Client) -> None:
             return
 
 
-def transactions_page():
+def transactions_page(user: Client):
     while True:
         clear()
-        print("\n\t\t========= Transactions ==========\n")
-        print('{:25s} {:25s} {:25s} {:25s}'.format("Amount", "From", "To", "Information"))
+        transactions = user.get_transactions()
+        transactions_info: list[dict] = []
+        for transaction in transactions:
+            transactions_info.append({"amount": str(transaction.amount) + '$', "from": transaction.sender, "to": str(transaction.recipient), "date": str(transaction.date), "information": transaction.info})
 
-        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort")
+        print_table(transactions_info)
+
+        print("[" + Colors.BLUE + "1" + Colors.END + "] Sort")
         print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
+        print("[" + Colors.BLUE + "3" + Colors.END + "] Refresh")
+        print("[" + Colors.BLUE + "4" + Colors.END + "] Make a Deposit")
+        print("[" + Colors.BLUE + "5" + Colors.END + "] Back")
 
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
             pass
         elif answer == '2':
             pass
+        elif answer == '3':
+            pass
+        elif answer == '4':
+            pass
+        elif answer == '5':
+            return
     
 
 def main():
@@ -245,7 +260,7 @@ def main():
         elif answer == '3':
             user.delete_account()
         elif answer == '4':
-            transactions_page()
+            transactions_page(user)
         elif answer == '5':
             user.make_transaction()
         elif answer == '6':
