@@ -2,6 +2,7 @@ import datetime
 
 from savable import Savable
 from transaction import Transaction
+from colors import Colors
 
 FILE = "accounts.txt"
 
@@ -30,8 +31,19 @@ class Account(Savable):
         Account.delete_accont_by_id(self.id)
         self.save()
     
-    def get_my_transactions(self) -> list[Transaction]:
-        return list(filter(lambda transaction: self.__is_my_transaction(transaction), Transaction.get_transactions()))
+    def get_transactions(self) -> list[Transaction]:
+        transactions = []
+        for transaction in Transaction.get_transactions():
+            is_mine = False
+            if self.__is_transaction_recipient(transaction):
+                transaction.recipient = Colors.BLUE + self.name + Colors.END
+                is_mine = True
+            elif self.__is_transaction_sender(transaction):
+                transaction.sender = Colors.BLUE + self.name + Colors.END
+                is_mine = True
+            if is_mine:
+                transactions.append(transaction)
+        return transactions
 
     @staticmethod
     def delete_accont_by_id(id: str) -> None:
@@ -60,9 +72,6 @@ class Account(Savable):
         for account in accounts:
             if account.__is_transaction_recipient(last_transaction):
                 account.update_balance(last_transaction.amount)
-    
-    def __is_my_transaction(self, transaction: Transaction) -> bool:
-        return self.__is_transaction_sender(transaction) or self.__is_transaction_recipient(transaction)
 
     def __is_transaction_sender(self, transaction: Transaction) -> bool:
         return True if transaction.sender == self.id else False
