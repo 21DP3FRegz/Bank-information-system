@@ -1,6 +1,7 @@
 import datetime
 
 from savable import Savable
+from id import ID
 
 FILE = "transactions.txt"
 
@@ -15,6 +16,8 @@ class Transaction(Savable):
             info: str,
             date = datetime.date.today(),
         ):
+        if id == None:
+            id = ID.auto_increment(FILE)
         self.id = id
         self.amount = amount
         self.recipient = recipient

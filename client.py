@@ -32,23 +32,30 @@ class Client(Savable):
         new_account = Account(
             id=ID.create(16),
             holder=self.login,
-            name=input("Create a name for this account:\n")
+            name=input("Create a name for this account:\n").replace(':', '')
         )
         new_account.save()
         return new_account
     
     def delete_account(self) -> None:
-        clear()
-        print("\n======== Delete Account ==========\n")
         account_to_delete: Account = self.choose_account("\nWhich account do you want to delete?\n>>> ")
         if account_to_delete is None:
             return
-
+        
         id_to_delete = account_to_delete.id
         Account.delete_accont_by_id(id_to_delete)
     
     def choose_account(self, message: str, warning: str = '') -> Account:
         accounts = self.get_accounts()
+        if accounts == []:
+            print(Colors.WARNING + "You do not have a bank account at the moment." + Colors.END)
+            answer: str = input("\nDo You want to create one? " + Colors.BLUE + "[Y/n]\n" + Colors.END).lower().strip()
+            if answer == 'y' or answer == '':
+                self.create_account()
+                accounts = self.get_accounts()
+            else:
+                return None
+        
         clear()
         [print("[" + Colors.BLUE, i+1, Colors.END + "]", account.name) for i, account in enumerate(accounts)]
         print("[" + Colors.BLUE + " B " + Colors.END + "] Back\n")
@@ -88,11 +95,11 @@ class Client(Savable):
         if account is None:
             return
         
-        transaction_info = input("Enter a transaction description: ")
+        transaction_info = input("\nEnter a transaction description: ").replace(':', '')
         print("\nIf id of the recipient will be " + Colors.WARNING + "incorrect" + Colors.END + ", you will simply lose your money")
-        recipient = input("Enter the id of the recipient of the transaction: ")
+        recipient = input("Enter the id of the recipient of the transaction: ").replace(':', '')
         while True:     # get amount
-            amount = input("Enter the transaction amount: ")
+            amount = input("\nEnter the transaction amount: ")
             if not is_float(amount) or float(amount) < 0:
                 print(Colors.WARNING + "The transaction amount should be a positive number." + Colors.END + " Try again.")
                 continue
@@ -103,7 +110,7 @@ class Client(Savable):
             break
         
         transaction = Transaction(
-            id=ID.create(11),
+            None,
             amount=amount,
             recipient = recipient,
             sender = account.id,

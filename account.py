@@ -35,10 +35,10 @@ class Account(Savable):
         transactions = []
         for transaction in Transaction.get_transactions():
             is_mine = False
-            if self.__is_transaction_recipient(transaction):
+            if self.is_transaction_recipient(transaction):
                 transaction.recipient = Colors.BLUE + self.name + Colors.END
                 is_mine = True
-            elif self.__is_transaction_sender(transaction):
+            elif self.is_transaction_sender(transaction):
                 transaction.sender = Colors.BLUE + self.name + Colors.END
                 is_mine = True
             if is_mine:
@@ -70,12 +70,11 @@ class Account(Savable):
         accounts = Account.get_accounts()
         last_transaction = Transaction.get_transactions()[-1]
         for account in accounts:
-            if account.__is_transaction_recipient(last_transaction):
+            if account.is_transaction_recipient(last_transaction):
                 account.update_balance(last_transaction.amount)
 
-    def __is_transaction_sender(self, transaction: Transaction) -> bool:
-        return True if transaction.sender == self.id else False
+    def is_transaction_sender(self, transaction: Transaction) -> bool:
+        return transaction.sender == self.id or transaction.sender == Colors.BLUE + self.name + Colors.END
     
-    def __is_transaction_recipient(self, transaction: Transaction) -> bool:
-        return True if transaction.recipient == self.id else False
-
+    def is_transaction_recipient(self, transaction: Transaction) -> bool:
+        return transaction.recipient == self.id or transaction.sender == Colors.BLUE + self.name + Colors.END

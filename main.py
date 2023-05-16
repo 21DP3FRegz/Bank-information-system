@@ -50,6 +50,9 @@ def get_valid_login() -> str:
 def get_valid_password() -> str:
     while True:
         password: str = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
+        if(not set(password).isdisjoint(set(string.punctuation))):
+            print(Colors.WARNING + "Please do not use special symbols!" + Colors.END)
+            continue
         if len(password) < 6:
             print(Colors.WARNING + "Password must be at least 6 symbols!" + Colors.END)
             continue
@@ -168,8 +171,8 @@ def filter_accounts_by_name(accounts: list[Account]) -> list[Account]:
 
 
 def filter_transactions(user: Client) -> list[Transaction]:
-    account = user.choose_account("Select the account whose transactions you want to view\n>>> ")
-    transactions = account.get_transactions()
+    account: Account = user.choose_account("Select the account whose transactions you want to view\n>>> ")
+    transactions: list[Transaction] = account.get_transactions()
     
     while True:
         clear()
@@ -179,9 +182,9 @@ def filter_transactions(user: Client) -> list[Transaction]:
         print("[" + Colors.BLUE + "3" + Colors.END + "] Both")
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
-            return list(filter(lambda transaction: account.__is_transaction_sender(transaction), transactions))
+            return list(filter(lambda transaction : account.is_transaction_sender(transaction), transactions))
         elif answer == '2':
-            return list(filter(lambda transaction: account.__is_transaction_recipient(transaction), transactions))
+            return list(filter(lambda transaction : account.is_transaction_recipient(transaction), transactions))
         elif answer == '3':
             return transactions
 
@@ -251,7 +254,7 @@ def transactions_page(user: Client):
     
     while True:
         clear()
-        if transactions == []:
+        if len(transactions) == 0:
             print('\nNothing here\n')
         
         transactions_info: list[dict] = []
