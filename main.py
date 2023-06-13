@@ -1,79 +1,12 @@
 import setup
 
-import string
-import maskpass  # to hide the password
-
-from console import clear
+from console import *
+from validation import *
+from get_functions import *
 from client import Client
 from account import Account
 from transaction import Transaction
 from colors import Colors
-
-
-def get_natural_number(message: str, min_value=1) -> int:
-    while True:
-        try:
-            num = int(input(message))
-        except ValueError:
-            print(Colors.FAIL + "Please enter the numbers!" + Colors.END)
-            continue
-        if num < min_value:
-            print(Colors.WARNING + "Please enter valid number!" + Colors.END)
-            continue
-        return num
-
-
-def get_password(message: str) -> str:
-    try:
-        return maskpass.advpass(message).strip()
-    except KeyboardInterrupt:
-        pass
-
-
-def get_valid_login() -> str:
-    get_user_input = lambda: input("\n" + Colors.BLUE + "Username" + Colors.END + " : ").strip().lower()
-    logins: list = [client.login for client in Client.get_clients()]
-    while True:
-        login: str = get_user_input()
-        if(login in logins):
-            print(Colors.WARNING + "This Username already excist! "  + Colors.END + "Please pick another one!")
-            continue
-        if(not set(login).isdisjoint(set(string.punctuation))):
-            print(Colors.WARNING + "Please do not use special symbols!" + Colors.END)
-            continue
-        if len(login) < 4:
-            print(Colors.WARNING + "Username must be 4 symbols or more!" + Colors.END)
-            continue
-        return login
-
-
-def get_valid_password() -> str:
-    while True:
-        password: str = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
-        if(not set(password).isdisjoint(set(string.punctuation))):
-            print(Colors.WARNING + "Please do not use special symbols!" + Colors.END)
-            continue
-        if len(password) < 6:
-            print(Colors.WARNING + "Password must be at least 6 symbols!" + Colors.END)
-            continue
-        if password != get_password("\n" + Colors.BLUE + "Confirm Password" + Colors.END + " : "):
-            print(Colors.FAIL + "Passwords are different!" + Colors.END)
-            continue
-        return password
-
-
-def print_table(dicts: list[dict]) -> None:
-    if len(dicts) == 0:
-        return
-    for key in dicts[0].keys():
-        print('{:25s}'.format(str(key).replace('_', ' ').capitalize()), end='')
-    print('\n' + '-' * 25 * len(dicts[0]))
-    for dict in dicts:
-        for value in dict.values():
-            print('{:25s}'.format(value), end='')
-            print(' '*9 if Colors.END in value else '', end='')
-        print()
-    print('-' * 25 * len(dicts[0]) + '\n')
 
 
 def register_user() -> Client:
@@ -118,30 +51,8 @@ def sign_in_user() -> Client:
 def sort_accounts(accounts: list[Account]) -> list[Account]:
     while True:
         clear()
-        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort by name")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort by balance")
-        print("[" + Colors.BLUE + "3" + Colors.END + "] Sort by date")
-
-        answer: str = input("\nEnter Your choise : ")
-        if answer == '1':
-            sorted_accounts = sorted(accounts, key=lambda account: account.name)
-            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
-
-        if answer == '2':
-            sorted_accounts = sorted(accounts, key=lambda account: account.balance)
-            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
-        
-        if answer == '3':
-            sorted_accounts = sorted(accounts, key=lambda account: account.date_opened)
-            return sorted_accounts if sorted_accounts != accounts else sorted_accounts[::-1]
-
-
-def sort_accounts(accounts: list[Account]) -> list[Account]:
-    while True:
-        clear()
-        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort by name")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort by balance")
-        print("[" + Colors.BLUE + "3" + Colors.END + "] Sort by date")
+        choises = ['Sort by name', 'Sort by balance', 'Sort by date']
+        print_menu(choises)
 
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
@@ -177,9 +88,9 @@ def filter_transactions(user: Client) -> list[Transaction]:
     while True:
         clear()
         print('Select what You want to view:\n')
-        print("[" + Colors.BLUE + "1" + Colors.END + "] Sent transactions")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Received transactions")
-        print("[" + Colors.BLUE + "3" + Colors.END + "] Both")
+        choises = ['Sent transactions', 'Received transactions', 'Both']
+        print_menu(choises)
+        
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
             return list(filter(lambda transaction : account.is_transaction_sender(transaction), transactions))
@@ -192,8 +103,8 @@ def filter_transactions(user: Client) -> list[Transaction]:
 def sort_transaction(transactions: list[Transaction]) -> list[Transaction]:
     while True:
         clear()
-        print("\n[" + Colors.BLUE + "1" + Colors.END + "] Sort by amount")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort by date")
+        choises = ['Sort by amount', 'Sort by date']
+        print_menu(choises)
 
         answer: str = input("\nEnter Your choise : ")
         if answer == '1':
@@ -203,6 +114,15 @@ def sort_transaction(transactions: list[Transaction]) -> list[Transaction]:
         if answer == '2':
             sorted_transactions = sorted(transactions, key=lambda transaction: transaction.date)
             return sorted_transactions if sorted_transactions != transactions else sorted_transactions[::-1]
+
+
+def accounts_summary(accounts: list[Account]) -> list[Account]:
+    clear()
+    total_balance = sum(account.balance for account in accounts)
+    summary: list[dict] = [{"Account count": len(accounts), "Total balance": str(total_balance) + ' $'}]
+    print_table(summary)
+    input("\nPress Enter to exit...")
+    return accounts
 
 
 def accounts_page(user: Client) -> None:
@@ -220,28 +140,40 @@ def accounts_page(user: Client) -> None:
         if accounts == []:
             print('\nNothing here\n')
         
-        accounts_info: list[dict] = [{"name": account.name, "balance": str(account.balance) + ' $', "day_oppened": str(account.date_opened), "id": account.id} for account in accounts]
-        
+        accounts_info: list[dict] = [{"name": account.name, "balance": str(account.balance) + ' $', "day_oppened": account.date_opened, "id": account.id} for account in accounts]
         print_table(accounts_info)
 
-        print("[" + Colors.BLUE + "1" + Colors.END + "] Sort")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Search")
-        print("[" + Colors.BLUE + "3" + Colors.END + "] Refresh")
-        print("[" + Colors.BLUE + "4" + Colors.END + "] Make a Deposit")
-        print("[" + Colors.BLUE + "5" + Colors.END + "] Back")
-
+        choises = ['Sort', 'Filter', 'Refresh', 'Deposit', 'Summary', 'Back']
+        print_menu(choises)
+        
         answer: str = input("\nEnter Your choise : ")
-        if answer == '1':
-            accounts = sort_accounts(accounts)
-        elif answer == '2':
-            accounts = filter_accounts_by_name(user.get_accounts())
-        elif answer == '3':
-            accounts = user.get_accounts()
-        elif answer == '4':
-            user.make_deposit()
-            accounts = user.get_accounts()
-        elif answer == '5':
+        
+        options = {
+            '1': lambda: sort_accounts(accounts),
+            '2': lambda: filter_accounts_by_name(user.get_accounts()),
+            '3': lambda: user.get_accounts(),
+            '4': lambda: user.make_deposit(),
+            '5': lambda: accounts_summary(accounts),
+        }
+
+        action = options.get(answer)
+        if action:
+             accounts = action()
+        elif answer == '6':
             return
+
+
+def transaction_summary(user: Client, transactions: list[Transaction]) -> list[Transaction]:
+    clear()
+    transactions = user.get_transactions()
+    income: float = user.count_income()
+    
+    summary: list[dict] = [{"Transaction count": len(user.get_transactions()), "income": str(income) + ' $', "Period": 'All Time'}]
+    print_table(summary)
+    
+    input("\nPress Enter to exit...")
+    
+    return transactions
 
 
 def transactions_page(user: Client):
@@ -263,19 +195,22 @@ def transactions_page(user: Client):
 
         print_table(transactions_info)
 
-        print("[" + Colors.BLUE + "1" + Colors.END + "] Filter")
-        print("[" + Colors.BLUE + "2" + Colors.END + "] Sort")
-        print("[" + Colors.BLUE + "3" + Colors.END + "] Refresh")
-        print("[" + Colors.BLUE + "4" + Colors.END + "] Back")
-
+        choises = ['Filter', 'Sort', 'Refresh', 'Summary', 'Back']
+        print_menu(choises)
+        
         answer: str = input("\nEnter Your choise : ")
-        if answer == '1':
-            transactions = filter_transactions(user)
-        elif answer == '2':
-            transactions = sort_transaction(transactions)
-        elif answer == '3':
-            transactions = user.get_transactions()
-        elif answer == '4':
+        
+        options = {
+            '1': lambda: filter_transactions(user),
+            '2': lambda: sort_transaction(transactions),
+            '3': lambda: user.get_transactions(),
+            '4': lambda: transaction_summary(user, transactions)
+        }
+        
+        action = options.get(answer)
+        if action:
+             transactions = action()
+        elif answer == '5':
             return
     
 

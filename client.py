@@ -1,5 +1,5 @@
 from console import clear
-from validation import is_float
+from validation import *
 from colors import Colors
 from id import ID
 from savable import Savable
@@ -22,7 +22,7 @@ class Client(Savable):
     
     def get_transactions(self):
         transactions: list = []
-        for account in  self.get_accounts():
+        for account in self.get_accounts():
             transactions.extend(account.get_transactions())
         return transactions
 
@@ -76,7 +76,7 @@ class Client(Savable):
         clear()    
         account: Account = self.choose_account("\nWhich account do you want to deposit into?\n>>> ")
         if account is None:
-            return
+            return self.get_accounts()
 
         while True:
             amount = input("Enter the deposit amount: ")
@@ -85,7 +85,7 @@ class Client(Savable):
             print(Colors.WARNING + "The deposit amount should be a positive number." + Colors.END + " Try again.")
             
         account.update_balance(float(amount))
-        return
+        return self.get_accounts()
     
     def make_transaction(self) -> None:
         clear()
@@ -119,6 +119,9 @@ class Client(Savable):
         transaction.save()
         account.update_balance(-amount)
         Account.update_accounts_balance()
+    
+    def count_income(self) -> float:    
+        return round(sum(account.count_income() for account in self.get_accounts()), 2)
     
     @staticmethod
     def get_clients() -> list:
