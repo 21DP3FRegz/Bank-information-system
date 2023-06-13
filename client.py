@@ -1,4 +1,5 @@
 from console import clear
+from datetime import *
 from validation import *
 from colors import Colors
 from id import ID
@@ -20,10 +21,10 @@ class Client(Savable):
     def get_accounts(self) -> list[Account]:
         return list(filter(lambda account: self.__is_mine_account(account), Account.get_accounts()))
     
-    def get_transactions(self):
+    def get_transactions(self, period = datetime.today() - timedelta(days=0)):
         transactions: list = []
         for account in self.get_accounts():
-            transactions.extend(account.get_transactions())
+            transactions.extend(account.get_transactions(period))
         return transactions
 
     def create_account(self) -> Account:

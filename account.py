@@ -2,12 +2,9 @@ from functions import *
 from savable import Savable
 from transaction import Transaction
 from colors import Colors
-
-import datetime
+from datetime import *
 
 FILE = "accounts.txt"
-
-
 
 
 class Account(Savable):
@@ -16,7 +13,7 @@ class Account(Savable):
             id: str,
             holder: str,
             name: str,
-            date_opened = datetime.date.today(),
+            date_opened = datetime.today(),
             balance: float = 0
         ):
         self.id = id
@@ -34,9 +31,12 @@ class Account(Savable):
         Account.delete_accont_by_id(self.id)
         self.save()
     
-    def get_transactions(self) -> list[Transaction]:
+    def get_transactions(self, period = datetime.today() - timedelta(days=0)) -> list[Transaction]:
         transactions = []
         for transaction in Transaction.get_transactions():
+            if is_in_period(transaction.date, period):
+                continue
+            
             is_mine = False
             if self.is_transaction_recipient(transaction):
                 transaction.recipient = Colors.BLUE + self.name + Colors.END
@@ -64,7 +64,7 @@ class Account(Savable):
             accounts = list()
             for line in file.readlines():
                 id, holder, balance, date_opened, name = line.strip('\n').split(':')
-                date_opened = datetime.datetime.strptime(date_opened.replace('-', ''), "%Y%m%d").strftime("%Y-%m-%d")
+                date_opened = datetime.strptime(date_opened.replace('-', ''), "%Y%m%d").strftime("%Y-%m-%d")
                 accounts.append(Account(id, holder, name, date_opened, float(balance)))
             return accounts
     
@@ -77,7 +77,7 @@ class Account(Savable):
                 account.update_balance(last_transaction.amount)
 
     def count_income(self, period: datetime) -> float:
-        return sum(transaction.amount if self.is_transaction_recipient(transaction) else -transaction.amount for transaction in self.get_transactions() if is_in_period(transaction.date, period))
+        return sum(-transaction.amount if self.is_transaction_recipient(transaction) else +transaction.amount for transaction in self.get_transactions() if is_in_period(transaction.date, period))
 
     def is_transaction_sender(self, transaction: Transaction) -> bool:
         return transaction.sender == self.id or transaction.sender == Colors.BLUE + self.name + Colors.END

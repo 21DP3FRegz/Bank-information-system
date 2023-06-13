@@ -166,16 +166,19 @@ def accounts_page(user: Client) -> None:
 
 def transaction_summary(user: Client, transactions: list[Transaction]) -> list[Transaction]:
     clear()
-    all_transactions = user.get_transactions()
+    all_transactions_count = len(user.get_transactions())
     all_income: float = user.count_income(datetime.min)
     
+    last_year_transactions_count = all_transactions_count - len(user.get_transactions(datetime.today() - timedelta(days=365)))
     last_year_income: float = user.count_income(datetime.today() - timedelta(days=365))
     
+    last_month_transactions_count = all_transactions_count - len(user.get_transactions(datetime.today() - timedelta(days=31)))
     last_month_income: float = user.count_income(datetime.today() - timedelta(days=31))
     
-    summary: list[dict] = [{"Transaction count": len(all_transactions), "income": str(all_income) + ' $', "Period": 'All Time'},
-                           {"Transaction count": len(user.get_transactions()), "income": str(last_year_income) + ' $', "Period": 'Last Year'},
-                           {"Transaction count": len(user.get_transactions()), "income": str(last_month_income) + ' $', "Period": 'Last Year'}]
+    summary: list[dict] = [{"Transaction count": all_transactions_count, "income": str(all_income) + ' $', "Period": 'All Time'},
+                           {"Transaction count": last_year_transactions_count, "income": str(last_year_income) + ' $', "Period": 'Last Year'},
+                           {"Transaction count": last_month_transactions_count, "income": str(last_month_income) + ' $', "Period": 'Last Month'}]
+    
     print_table(summary)
     
     input("\nPress Enter to exit...")
