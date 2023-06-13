@@ -120,8 +120,8 @@ class Client(Savable):
         account.update_balance(-amount)
         Account.update_accounts_balance()
     
-    def count_income(self) -> float:    
-        return round(sum(account.count_income() for account in self.get_accounts()), 2)
+    def count_income(self, period) -> float:
+        return round(sum(account.count_income(period) for account in self.get_accounts()), 2)
     
     @staticmethod
     def get_clients() -> list:

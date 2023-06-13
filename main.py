@@ -1,5 +1,6 @@
 import setup
 
+from datetime import *
 from console import *
 from validation import *
 from get_functions import *
@@ -165,10 +166,16 @@ def accounts_page(user: Client) -> None:
 
 def transaction_summary(user: Client, transactions: list[Transaction]) -> list[Transaction]:
     clear()
-    transactions = user.get_transactions()
-    income: float = user.count_income()
+    all_transactions = user.get_transactions()
+    all_income: float = user.count_income(datetime.min)
     
-    summary: list[dict] = [{"Transaction count": len(user.get_transactions()), "income": str(income) + ' $', "Period": 'All Time'}]
+    last_year_income: float = user.count_income(datetime.today() - timedelta(days=365))
+    
+    last_month_income: float = user.count_income(datetime.today() - timedelta(days=31))
+    
+    summary: list[dict] = [{"Transaction count": len(all_transactions), "income": str(all_income) + ' $', "Period": 'All Time'},
+                           {"Transaction count": len(user.get_transactions()), "income": str(last_year_income) + ' $', "Period": 'Last Year'},
+                           {"Transaction count": len(user.get_transactions()), "income": str(last_month_income) + ' $', "Period": 'Last Year'}]
     print_table(summary)
     
     input("\nPress Enter to exit...")

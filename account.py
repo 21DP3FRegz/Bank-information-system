@@ -1,10 +1,13 @@
-import datetime
-
+from functions import *
 from savable import Savable
 from transaction import Transaction
 from colors import Colors
 
+import datetime
+
 FILE = "accounts.txt"
+
+
 
 
 class Account(Savable):
@@ -73,8 +76,8 @@ class Account(Savable):
             if account.is_transaction_recipient(last_transaction):
                 account.update_balance(last_transaction.amount)
 
-    def count_income(self) -> float:
-        return sum(transaction.amount if self.is_transaction_recipient(transaction) else -transaction.amount for transaction in self.get_transactions())
+    def count_income(self, period: datetime) -> float:
+        return sum(transaction.amount if self.is_transaction_recipient(transaction) else -transaction.amount for transaction in self.get_transactions() if is_in_period(transaction.date, period))
 
     def is_transaction_sender(self, transaction: Transaction) -> bool:
         return transaction.sender == self.id or transaction.sender == Colors.BLUE + self.name + Colors.END
