@@ -1,5 +1,6 @@
 import setup
 
+from functions import *
 from datetime import *
 from console import *
 from validation import *
@@ -16,6 +17,7 @@ def register_user() -> Client:
 
     login: str = get_valid_login()
     password: str = get_valid_password()
+    password = hash_password(password)
 
     new_client = Client(
         login=login,
@@ -42,7 +44,7 @@ def sign_in_user() -> Client:
     user: Client = next((client for client in clients if client.login == login), None)
 
     password: str = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
-    while password != user.password:
+    while not verify_password(password, user.password):
         if password != '':
             print(Colors.FAIL + "Wrong password!" + Colors.END)
         password = get_password("\n" + Colors.BLUE + "Password" + Colors.END + " : ")
@@ -89,6 +91,7 @@ def filter_transactions(user: Client) -> list[Transaction]:
     while True:
         clear()
         print('Select what You want to view:\n')
+        
         choises = ['Sent transactions', 'Received transactions', 'Both']
         print_menu(choises)
         
